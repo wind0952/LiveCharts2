@@ -10,6 +10,8 @@
         Series="{Binding Series}"
         DrawMarginFrame="{Binding Frame}"
         XAxes="{Binding XAxes}"
-        YAxes="{Binding YAxes}">
+        YAxes="{Binding YAxes}"
+        PointerMoveCommand="{Binding PointerMoveCmd}"
+        ZoomMode="X">
     </lvc:CartesianChart>
 </UserControl>

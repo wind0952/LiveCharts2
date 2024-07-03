@@ -598,7 +598,7 @@ public abstract class CoreAxis<TDrawingContext, TTextGeometry, TLineGeometry>
             if (visualSeparator.Separator is not null)
                 UpdateSeparator(visualSeparator.Separator, x + sxco, y + syco, lxi, lxj, lyi, lyj, UpdateMode.Update);
             if (visualSeparator.Subseparators is not null)
-                UpdateSubseparators(visualSeparator.Subseparators, scale, s, x + sxco, y + tyco, lxi, lxj, lyi, lyj, UpdateMode.Update);
+                UpdateSubseparators(visualSeparator.Subseparators, scale, 1, x + sxco, y + tyco, lxi, lxj, lyi, lyj, UpdateMode.Update);
             if (visualSeparator.Tick is not null)
                 UpdateTick(visualSeparator.Tick, _tickLength, x + txco, y + tyco, UpdateMode.Update);
             if (visualSeparator.Subticks is not null)
@@ -1249,24 +1249,39 @@ public abstract class CoreAxis<TDrawingContext, TTextGeometry, TLineGeometry>
     private void UpdateSubseparators(
         ILineGeometry<TDrawingContext>[] subseparators, Scaler scale, double s, float x, float y, float lxi, float lxj, float lyi, float lyj, UpdateMode mode)
     {
-        for (var j = 0; j < subseparators.Length; j++)
+        if (_orientation == AxisOrientation.Y)
         {
-            var subseparator = subseparators[j];
-            var kl = (j + 1) / (double)(_subseparatorsCount + 1);
-
-            if (_logBase is not null) kl = Math.Log(kl, _logBase.Value);
-
-            float xs = 0f, ys = 0f;
-            if (_orientation == AxisOrientation.X)
+            for (var j = 0; j < subseparators.Length; j++)
             {
-                xs = scale.MeasureInPixels(s * kl);
-            }
-            else
-            {
+                var subseparator = subseparators[j];
+                var kl = (j + 1) / (double)(_subseparatorsCount + 1);
+
+                if (_logBase is not null) kl = Math.Log(kl, _logBase.Value);
+
+                float xs = 0f, ys = 0f;
                 ys = scale.MeasureInPixels(s * kl);
+                ys = scale.MeasureInPixels(s * kl);
+                Debug.Print($"Sub {kl},{s},{x},{xs},{x + xs},{y},{ys},{y + ys},{lxi},{lxj},{lyi}, {lyj}");
+                UpdateSeparator(subseparator, x + xs, y + ys, lxi, lxj, lyi, lyj, mode);
             }
+        }
+        else
+        {
+            var k = (subseparators.Length + 1) / (double)(_subseparatorsCount + 1);
+            if (_logBase is not null) k = Math.Log(k, _logBase.Value);
+            x += scale.MeasureInPixels(s * k);
+            for (var j = 0; j < subseparators.Length; j++)
+            {
+                var subseparator = subseparators[j];
+                var kl = (j + 1) / (double)(_subseparatorsCount + 1);
 
-            UpdateSeparator(subseparator, x + xs, y + ys, lxi, lxj, lyi, lyj, mode);
+                if (_logBase is not null) kl = Math.Log(kl, _logBase.Value);
+
+                float xs = 0f, ys = 0f;
+                xs = scale.MeasureInPixels(s * kl);
+                Debug.Print($"Sub {kl},{s},{x},{xs},{x + xs},{y},{ys},{y + ys},{lxi},{lxj},{lyi}, {lyj}");
+                UpdateSeparator(subseparator, x - xs, y + ys, lxi, lxj, lyi, lyj, mode);
+            }
         }
     }
 
