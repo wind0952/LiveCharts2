@@ -12,6 +12,7 @@
         LegendPosition="Left"
         LegendBackgroundPaint="{Binding LedgendBackgroundPaint}"
         LegendTextPaint="{Binding LegendTextPaint}"
-        LegendTextSize="16">
+        LegendTextSize="16"
+        ZoomMode="Both">
     </lvc:CartesianChart>
 </UserControl>

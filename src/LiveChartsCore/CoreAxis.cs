@@ -1249,38 +1249,58 @@ public abstract class CoreAxis<TDrawingContext, TTextGeometry, TLineGeometry>
     private void UpdateSubseparators(
         ILineGeometry<TDrawingContext>[] subseparators, Scaler scale, double s, float x, float y, float lxi, float lxj, float lyi, float lyj, UpdateMode mode)
     {
-        if (_orientation == AxisOrientation.Y)
+        if (_logBase is not null)
         {
-            for (var j = 0; j < subseparators.Length; j++)
+            if (_orientation == AxisOrientation.Y)
             {
-                var subseparator = subseparators[j];
-                var kl = (j + 1) / (double)(_subseparatorsCount + 1);
+                for (var j = 0; j < subseparators.Length; j++)
+                {
+                    var subseparator = subseparators[j];
+                    var kl = (j + 1) / (double)(_subseparatorsCount + 1);
 
-                if (_logBase is not null) kl = Math.Log(kl, _logBase.Value);
+                    kl = Math.Log(kl, _logBase.Value);
 
-                float xs = 0f, ys = 0f;
-                ys = scale.MeasureInPixels(s * kl);
-                ys = scale.MeasureInPixels(s * kl);
-                Debug.Print($"Sub {kl},{s},{x},{xs},{x + xs},{y},{ys},{y + ys},{lxi},{lxj},{lyi}, {lyj}");
-                UpdateSeparator(subseparator, x + xs, y + ys, lxi, lxj, lyi, lyj, mode);
+                    float xs = 0f, ys = 0f;
+                    ys = scale.MeasureInPixels(s * kl);
+                    UpdateSeparator(subseparator, x + xs, y + ys, lxi, lxj, lyi, lyj, mode);
+                }
+            }
+            else
+            {
+                var k = (subseparators.Length + 1) / (double)(_subseparatorsCount + 1);
+                k = Math.Log(k, _logBase.Value);
+                x += scale.MeasureInPixels(s * k);
+                for (var j = 0; j < subseparators.Length; j++)
+                {
+                    var subseparator = subseparators[j];
+                    var kl = (j + 1) / (double)(_subseparatorsCount + 1);
+
+                    kl = Math.Log(kl, _logBase.Value);
+
+                    float xs = 0f, ys = 0f;
+                    xs = scale.MeasureInPixels(s * kl);
+                    UpdateSeparator(subseparator, x - xs, y + ys, lxi, lxj, lyi, lyj, mode);
+                }
             }
         }
         else
         {
-            var k = (subseparators.Length + 1) / (double)(_subseparatorsCount + 1);
-            if (_logBase is not null) k = Math.Log(k, _logBase.Value);
-            x += scale.MeasureInPixels(s * k);
             for (var j = 0; j < subseparators.Length; j++)
             {
                 var subseparator = subseparators[j];
                 var kl = (j + 1) / (double)(_subseparatorsCount + 1);
 
-                if (_logBase is not null) kl = Math.Log(kl, _logBase.Value);
-
                 float xs = 0f, ys = 0f;
-                xs = scale.MeasureInPixels(s * kl);
-                Debug.Print($"Sub {kl},{s},{x},{xs},{x + xs},{y},{ys},{y + ys},{lxi},{lxj},{lyi}, {lyj}");
-                UpdateSeparator(subseparator, x - xs, y + ys, lxi, lxj, lyi, lyj, mode);
+                if (_orientation == AxisOrientation.X)
+                {
+                    xs = scale.MeasureInPixels(s * kl);
+                }
+                else
+                {
+                    ys = scale.MeasureInPixels(s * kl);
+                }
+
+                UpdateSeparator(subseparator, x + xs, y + ys, lxi, lxj, lyi, lyj, mode);
             }
         }
     }
@@ -1288,13 +1308,21 @@ public abstract class CoreAxis<TDrawingContext, TTextGeometry, TLineGeometry>
     private void UpdateSubticks(
         ILineGeometry<TDrawingContext>[] subticks, Scaler scale, double s, float x, float y, UpdateMode mode)
     {
+        var isLog = _logBase is not null;
+        if (isLog)
+        {
+            var k = (_subseparatorsCount + 1) / (double)(_subseparatorsCount + 1);
+            k = Math.Log(k, _logBase.Value);
+            x += scale.MeasureInPixels(s * k);
+        }
         for (var j = 0; j < subticks.Length; j++)
         {
             var subtick = subticks[j];
 
-            var k = 0.5f;
+            var k = 0.75f;
             var kl = (j + 1) / (double)(_subseparatorsCount + 1);
-            if (Math.Abs(kl - 0.5f) < 0.01) k += 0.25f;
+            if (Math.Abs(kl - 0.5f) < 0.01 && !isLog) k += 0.25f;
+            if (isLog) kl = Math.Log(kl, _logBase.Value);
 
             float xs = 0f, ys = 0f;
             if (_orientation == AxisOrientation.X)
@@ -1306,7 +1334,8 @@ public abstract class CoreAxis<TDrawingContext, TTextGeometry, TLineGeometry>
                 ys = scale.MeasureInPixels(s * kl);
             }
 
-            UpdateTick(subtick, _tickLength * k, x + xs, y + ys, mode);
+            var xxs = isLog ? x - xs : x + xs;
+            UpdateTick(subtick, _tickLength * k, xxs, y + ys, mode);
         }
     }
 

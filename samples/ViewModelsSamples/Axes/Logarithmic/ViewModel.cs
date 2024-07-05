@@ -61,6 +61,7 @@ public partial class ViewModel : ObservableObject
             CrosshairLabelsPaint = new SolidColorPaint(SKColors.DarkRed, 1),
             CrosshairPaint = new SolidColorPaint(SKColors.DarkOrange, 1),
             CrosshairPadding = new Padding(30,0, 0, 30),
+            SubticksPaint = new SolidColorPaint(SKColors.Gray, 1),
         }
     };
 
@@ -82,6 +83,10 @@ public partial class ViewModel : ObservableObject
             CrosshairLabelsPaint = new SolidColorPaint(SKColors.DarkRed, 1),
             CrosshairPaint = new SolidColorPaint(SKColors.DarkOrange, 1),
             CrosshairPadding = new Padding(30,0, 0, 0),
+            SubticksPaint = new SolidColorPaint(SKColors.Gray, 1),
+            //TicksPaint = new SolidColorPaint(SKColors.Gray, 1),
+            //TicksAtCenter = true
+            //DrawTicksPath = true
         }
     };
     public ViewModel()
