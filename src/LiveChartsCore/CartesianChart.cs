@@ -880,8 +880,8 @@ public class CartesianChart<TDrawingContext> : Chart<TDrawingContext>
             _zoomingSection.X = x;
             _zoomingSection.Y = y;
 
-            var xMode = (_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X;
-            var yMode = (_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y;
+            var xMode = _zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X ;
+            var yMode = _zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y;
 
             if (!xMode)
             {
@@ -910,8 +910,8 @@ public class CartesianChart<TDrawingContext> : Chart<TDrawingContext>
 
         if (_sectionZoomingStart is not null)
         {
-            var xMode = (_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X;
-            var yMode = (_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y;
+            var xMode = _zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X;
+            var yMode = _zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y;
 
             var x = point.X;
             var y = point.Y;
@@ -947,7 +947,7 @@ public class CartesianChart<TDrawingContext> : Chart<TDrawingContext>
                 return;
             }
 
-            if ((_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X)
+            if (_zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.X) == ZoomAndPanMode.X)
             {
                 for (var i = 0; i < XAxes.Length; i++)
                 {
@@ -994,7 +994,7 @@ public class CartesianChart<TDrawingContext> : Chart<TDrawingContext>
                 }
             }
 
-            if ((_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y)
+            if (_zoomMode == ZoomAndPanMode.RoiZoom || (_zoomMode & ZoomAndPanMode.Y) == ZoomAndPanMode.Y)
             {
                 for (var i = 0; i < YAxes.Length; i++)
                 {
